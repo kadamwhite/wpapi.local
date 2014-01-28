@@ -417,71 +417,49 @@ if [[ $ping_result == *bytes?from* ]]; then
 	fi
 
 	# Install and configure the latest stable version of WordPress
-	if [[ ! -d /srv/www/wordpress-default ]]; then
+	if [[ ! -d /srv/www/wordpress-api ]]; then
 		echo "Downloading WordPress Stable, see http://wordpress.org/"
 		cd /srv/www/
 		curl -O http://wordpress.org/latest.tar.gz
 		tar -xvf latest.tar.gz
-		mv wordpress wordpress-default
+		mv wordpress wordpress-api
 		rm latest.tar.gz
-		cd /srv/www/wordpress-default
+		cd /srv/www/wordpress-api
+
 		echo "Configuring WordPress Stable..."
-		wp core config --dbname=wordpress_default --dbuser=wp --dbpass=wp --quiet --extra-php --allow-root <<PHP
+		wp core config --dbname=wordpress_api --dbuser=wp --dbpass=wp --quiet --extra-php --allow-root <<PHP
 define( 'WP_DEBUG', true );
 PHP
-		wp core install --url=local.wordpress.dev --quiet --title="Local WordPress Dev" --admin_name=admin --admin_email="admin@local.dev" --admin_password="password" --allow-root 
+		wp core install --url=api.wordpress.dev --quiet --title="WordPress JSON API" --admin_name=api --admin_email="api@local.dev" --admin_password="api" --allow-root
+
+		echo "Downloading wptest content..."
+		git clone https://github.com/manovotny/wptest.git
+
+		echo "Installing wptest content..."
+		sudo -u vagrant -i -- wp --path="/srv/www/wordpress-api" plugin install wordpress-importer --activate
+		sudo -u vagrant -i -- wp --path="/srv/www/wordpress-api" import /srv/www/wordpress-api/wptest/wptest.xml --authors=create
+
+		echo "Cleaning up temporary files..."
+		sudo -u vagrant -i -- wp --path="/srv/www/wordpress-api" plugin deactivate wordpress-importer
+		sudo -u vagrant -i -- wp --path="/srv/www/wordpress-api" plugin uninstall wordpress-importer
+		rm -rf wptest
 	else
 		echo "Updating WordPress Stable..."
-		cd /srv/www/wordpress-default
+		cd /srv/www/wordpress-api
 		wp core upgrade --allow-root 
 	fi
+	if [[ ! -d /srv/www/wordpress-api/wp-content/plugins/WP-API ]]; then
+		echo "Installing WP-API Plugin..."
+		cd /srv/www/wordpress-api/wp-content/plugins
+		git clone https://github.com/WP-API/WP-API.git
 
-	# Checkout, install and configure WordPress trunk via core.svn
-	if [[ ! -d /srv/www/wordpress-trunk ]]; then
-		echo "Checking out WordPress trunk from core.svn, see http://core.svn.wordpress.org/trunk"
-		svn checkout http://core.svn.wordpress.org/trunk/ /srv/www/wordpress-trunk
-		cd /srv/www/wordpress-trunk
-		echo "Configuring WordPress trunk..."
-		wp core config --dbname=wordpress_trunk --dbuser=wp --dbpass=wp --quiet --extra-php --allow-root <<PHP
-define( 'WP_DEBUG', true );
-PHP
-		wp core install --url=local.wordpress-trunk.dev --quiet --title="Local WordPress Trunk Dev" --admin_name=admin --admin_email="admin@local.dev" --admin_password="password" --allow-root 
+		echo "Configuring & Activating WP-API Plugin..."
+		cd /srv/www/wordpress-api
+		sudo -u vagrant -i -- wp --path="/srv/www/wordpress-api" rewrite structure "/%year%/%monthnum%/%postname%"
+		sudo -u vagrant -i -- wp --path="/srv/www/wordpress-api" plugin activate WP-API
 	else
-		echo "Updating WordPress trunk..."
-		cd /srv/www/wordpress-trunk
-		svn up --ignore-externals
-	fi
-
-	# Checkout, install and configure WordPress trunk via develop.svn
-	if [[ ! -d /srv/www/wordpress-develop ]]; then
-		echo "Checking out WordPress trunk from develop.svn, see http://develop.svn.wordpress.org/trunk"
-		svn checkout http://develop.svn.wordpress.org/trunk/ /srv/www/wordpress-develop
-		cd /srv/www/wordpress-develop/src/
-		echo "Configuring WordPress develop..."
-		wp core config --dbname=wordpress_develop --dbuser=wp --dbpass=wp --quiet --extra-php --allow-root <<PHP
-// Allow (src|build).wordpress-develop.dev to share the same database
-if ( 'build' == basename( dirname( __FILE__) ) ) {
-	define( 'WP_HOME', 'http://build.wordpress-develop.dev' );
-	define( 'WP_SITEURL', 'http://build.wordpress-develop.dev' );
-}
-
-define( 'WP_DEBUG', true );
-PHP
-		wp core install --url=src.wordpress-develop.dev --quiet --title="WordPress Develop" --admin_name=admin --admin_email="admin@local.dev" --admin_password="password" --allow-root 
-		cp /srv/config/wordpress-config/wp-tests-config.php /srv/www/wordpress-develop/
-		cd /srv/www/wordpress-develop/
-		npm install &>/dev/null
-	else
-		echo "Updating WordPress develop..."
-		cd /srv/www/wordpress-develop/
-		svn up
-		npm install &>/dev/null
-	fi
-
-	if [[ ! -d /srv/www/wordpress-develop/build ]]; then
-		echo "Initializing grunt in WordPress develop... This may take a few moments."
-		cd /srv/www/wordpress-develop/
-		grunt
+		cd /srv/www/wordpress-api/wp-content/plugins/WP-API
+		git pull origin master
 	fi
 
 	# Download phpMyAdmin

@@ -1,6 +1,12 @@
-# Varying Vagrant Vagrants
+# WP-API Vagrant Varietal
 
-Varying Vagrant Vagrants is an evolving [Vagrant](http://vagrantup.com) configuration focused on [WordPress](http://wordpress.org) development.
+This is a customized variant of VVV, designed to install a single stable build of WordPress with the latest (master branch) version of the [WP-API](https://github.com/WP-API/WP-API) plugin.
+
+Note that this uses a separate box image from VVV, so remove the `-api` from the `config.vm.box` setting if you wish to re-use the box from an existing VVV install.
+
+Original VVV README file below.
+
+--------------------------
 
 * **Version**: 1.1-working
 * **Latest Stable**: [v1.0](https://github.com/10up/varying-vagrant-vagrants/tree/v1.0)
