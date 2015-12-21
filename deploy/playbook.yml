@@ -1,7 +1,174 @@
 - hosts: all
+  handlers:
+    - name: restart nginx
+      service: name=nginx state=restarted
+    - name: restart php5-fpm
+      service: name=php5-fpm state=restarted
   sudo: true
+  vars:
+    ##############
+    # ENVIRONMENT
+    ##############
+    env: development
+
+    # What you'll see at the bash prompt when you ssh into your server
+    hostname: ansible-vagrant
+
+    # Parent directory for mounted repository directories.
+    base_path: /mnt
+
+    # Where the production site symlink will exist.
+    site_path: "{{base_path}}/site"
+
+    ########
+    # SITES
+    ########
+    sites:
+      # Public Path == the web root of the site in the VM.
+      # FQDN == fully-qualified domain name. The fqdn settings should match the
+      # vagrant config.hostsupdater.aliases settings: because nginx checks this
+      # value against the URL being requested, it must be the same as the
+      # server's DNS name.
+      # Slug == the string used for the database name for each WP installation
+      # in the VM, as well as the ___.conf name of the site's nginx config.
+      stable:
+        public_path: '{{site_path}}/wpstable'
+        fqdn: 'wpapi.loc'
+        slug: 'wpstable'
+      trunk:
+        public_path: '{{site_path}}/wptrunk'
+        fqdn: 'wpapi-trunk.loc'
+        slug: 'wptrunk'
+
+    ###############
+    # PROVISIONING
+    ###############
+    apt:
+      # Keys to be added to apt.
+      # NOTE: commented out because we do not currently need node on the vm
+      # keys:
+      #   - "https://deb.nodesource.com/gpgkey/nodesource.gpg.key"
+
+      # Ppas to be added to apt. Useful ppas (replace trusty with your Ubuntu
+      # version codename, if necessary):
+      # Git latest:  ppa:git-core/ppa
+      # Node.js 5.x: deb https://deb.nodesource.com/setup_5.x trusty main
+      # NOTE: commented out because we do not currently need git or node on the vm
+      # ppas:
+      #   - "ppa:git-core/ppa"
+      #   - "deb https://deb.nodesource.com/setup_5.x trusty main"
+
+      # Any apt packages to install. Apt package versions may be specified like
+      # - git=2.1.0
+      packages:
+        # NOTE: commented out because we do not currently need git or node on the vm
+        # - git
+        # - nodejs
+        - nginx
+        - php5-cli
+        - php5-fpm
+        - php5-mysql
+        - php5-curl
+        - php5-imagick
+        - mysql-server
+
+    #############
+    # WEB SERVER
+    #############
+    nginx:
+      dir: /etc/nginx
+      conf_dir: /etc/nginx/conf.d
+
   tasks:
-    - name: install nginx
-      apt: name={{ item.name }} state={{ item.state | default( 'latest' ) }} update_cache=true
+    # Get the box up and running. These tasks run before the box is configured
+    # or the project is cloned or built. All system dependencies should be
+    # installed here.
+
+    # NOTE: commented out because we do not currently need node on the vm
+    # - name: add keys to apt
+    #   apt_key: url={{item}} state=present
+    #   with_items: apt_keys
+
+    # NOTE: commented out because we do not currently need git or node on the vm
+    # - name: add ppas to apt
+    #   apt_repository: repo="{{item}}" state=present update_cache=yes
+    #   with_items: apt_ppas
+
+    - name: install apt packages
+      apt: name={{item}} state=latest update_cache=yes
+      with_items: apt.packages
+      when: false
+
+    # Configure server. These tasks are run after a server is provisioned but
+    # before a project is deployed, to configure the system, add user accounts,
+    # and setup long-running processes like nginx, postgres, etc.
+
+    # Configure the box. This happens after the base initialization, but before
+    # the project is cloned or built.
+
+    - name: set hostname
+      hostname: name={{hostname}}
+
+    - name: add loopback references to our domains in /etc/hosts
+      lineinfile:
+        dest: /etc/hosts
+        state: present
+        line: 127.0.0.1 {{hostname}} {{item}}
       with_items:
-        - { name: nginx }
+        - '{{sites.trunk.fqdn}}'
+        - '{{sites.stable.fqdn}}'
+
+    - name: allow passwordless sudo - development only!
+      lineinfile:
+        dest: /etc/sudoers
+        state: present
+        regexp: ^%sudo
+        line: '%sudo\tALL=(ALL:ALL) NOPASSWD:ALL'
+        validate: visudo -cf %s
+      when: env == 'development'
+
+    # Generate nginx config files, rolling back changes if any part of the
+    # config is invalid.
+
+    - name: ensure default nginx server is not present
+      file: path=/etc/nginx/sites-enabled/default state=absent
+
+    - name: ensure nginx config files exist
+      shell: touch {{nginx.conf_dir}}/{{item.value.slug}}
+      args:
+        creates: '{{nginx.conf_dir}}/{{item.value.slug}}'
+      with_dict: sites
+
+    - name: backup existing nginx config files
+      shell: cp {{item.value.slug}} {{item.value.slug}}.backup
+      args:
+        chdir: '{{nginx.conf_dir}}'
+      with_dict: sites
+
+    - name: generate nginx config files
+      template: src=templates/nginx.conf dest={{nginx.conf_dir}}/{{item.value.slug}}.conf
+      register: nginx_conf
+      with_dict: sites #'{{ sites | combine({ env: "{{env}}" }}'
+      notify: restart nginx
+
+    - name: ensure nginx config is valid
+      shell: nginx -t
+      ignore_errors: yes
+      register: nginx_test_valid
+      changed_when: false
+      when: nginx_conf | changed
+
+    - name: remove temporary backups if new nginx config files are valid
+      file: path={{nginx.conf_dir}}/{{item.value.slug}}.backup state=absent
+      with_dict: sites
+      when: nginx_test_valid | success
+
+    - name: restore temporary backups if new nginx config files are invalid
+      shell: mv {{item.value.slug}}.backup {{item.value.slug}}
+      args:
+        chdir: '{{nginx.conf_dir}}'
+      with_dict: sites
+      when: nginx_test_valid | failed
+
+    - fail: msg='nginx config is invalid'
+      when: nginx_test_valid | failed

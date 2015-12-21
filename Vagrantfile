@@ -16,10 +16,12 @@ Vagrant.configure(2) do |config|
   config.vm.network "private_network", ip: "192.168.34.56"
 
   # Automatically add an entry to /etc/hosts for this Vagrant box (requires
-  # sudo). This should match the site_fqdn setting specified in the ansible
-  # "localdev" config.
+  # sudo). This should match the site.fqdn setting in the ansible config.
   # N.B. this requires the vagrant-hostsupdater plugin, see the README
-  config.hostsupdater.aliases = ['wpapi.loc']
+  config.hostsupdater.aliases = [
+    'wpapi.loc',      # Latest stable WP release
+    'wpapi-trunk.loc' # WordPress development trunk
+  ]
 
   # Share an additional folder to the guest VM. The first argument is
   # the path on the host to the actual folder. The second argument is
