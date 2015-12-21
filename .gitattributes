@@ -1,0 +1,6 @@
+* text=auto
+
+# Scripts & configuration always use LF end-of-line characters
+*.sh    eol=lf
+*.conf  eol=lf
+*.yml   eol=lf
