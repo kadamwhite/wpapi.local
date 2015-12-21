@@ -1,3 +1,8 @@
+# Ignore themes/plugins in the /content directory: these will be mounted within
+# the VM and therefore available to WordPress, but what plugins you use is out
+# of scope for this repository, which exists for provisioning alone
+content/
+
 # Modified from https://www.gitignore.io/api/vagrant,node,wordpress
 
 ### Vagrant ###

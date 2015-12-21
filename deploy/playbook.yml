@@ -1,0 +1,7 @@
+- hosts: all
+  sudo: true
+  tasks:
+    - name: install nginx
+      apt: name={{ item.name }} state={{ item.state | default( 'latest' ) }} update_cache=true
+      with_items:
+        - { name: nginx }
