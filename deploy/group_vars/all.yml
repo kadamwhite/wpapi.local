@@ -1,0 +1,76 @@
+##############
+# ENVIRONMENT
+##############
+
+env: development
+
+# What you'll see at the bash prompt when you ssh into your server
+hostname: ansible-vagrant
+
+# Parent directory for mounted repository directories.
+base_path: /mnt
+
+# Where the production site symlink will exist.
+site_path: "{{base_path}}/site"
+
+########
+# SITES
+########
+
+sites:
+  # Public Path == the web root of the site in the VM.
+  # FQDN == fully-qualified domain name. The fqdn settings should match the
+  # vagrant config.hostsupdater.aliases settings: because nginx checks this
+  # value against the URL being requested, it must be the same as the
+  # server's DNS name.
+  # Slug == the string used for the database name for each WP installation
+  # in the VM, as well as the ___.conf name of the site's nginx config.
+  stable:
+    public_path: '{{site_path}}/wpstable'
+    fqdn: 'wpapi.loc'
+    slug: 'wpstable'
+  trunk:
+    public_path: '{{site_path}}/wptrunk'
+    fqdn: 'wpapi-trunk.loc'
+    slug: 'wptrunk'
+
+###############
+# PROVISIONING
+###############
+
+apt:
+  # Keys to be added to apt.
+  # NOTE: commented out because we do not currently need node on the vm
+  # keys:
+  #   - "https://deb.nodesource.com/gpgkey/nodesource.gpg.key"
+
+  # Ppas to be added to apt. Useful ppas (replace trusty with your Ubuntu
+  # version codename, if necessary):
+  # Git latest:  ppa:git-core/ppa
+  # Node.js 5.x: deb https://deb.nodesource.com/setup_5.x trusty main
+  # NOTE: commented out because we do not currently need git or node on the vm
+  # ppas:
+  #   - "ppa:git-core/ppa"
+  #   - "deb https://deb.nodesource.com/setup_5.x trusty main"
+
+  # Any apt packages to install. Apt package versions may be specified like
+  # - git=2.1.0
+  packages:
+    # NOTE: commented out because we do not currently need git or node on the vm
+    # - git
+    # - nodejs
+    - nginx
+    - php5-cli
+    - php5-fpm
+    - php5-mysql
+    - php5-curl
+    - php5-imagick
+    - mysql-server
+
+#############
+# WEB SERVER
+#############
+
+nginx:
+  dir: /etc/nginx
+  conf_dir: /etc/nginx/conf.d
