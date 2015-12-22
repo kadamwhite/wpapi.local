@@ -74,3 +74,5 @@ apt:
 nginx:
   dir: /etc/nginx
   conf_dir: /etc/nginx/conf.d
+  sites_available: /etc/nginx/sites-available
+  sites_enabled: /etc/nginx/sites-enabled
