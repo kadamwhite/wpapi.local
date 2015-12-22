@@ -30,3 +30,4 @@ apt:
     - php5-curl
     - php5-imagick
     - mysql-server
+    - python-mysqldb

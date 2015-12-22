@@ -1,0 +1,21 @@
+- name: default php5-fpm pool is disabled
+  command: mv /etc/php5/fpm/pool.d/www.conf /etc/php5/fpm/pool.d/www.disabled
+  args:
+    creates: /etc/php5/fpm/pool.d/www.disabled
+  notify: restart php5-fpm
+
+- name: php is configured
+  template: src=php.ini dest=/etc/php5/fpm/php.ini
+  notify: restart php5-fpm
+
+- name: php5-fpm pool is configured for wordpress
+  template: src=wordpress.conf dest=/etc/php5/fpm/pool.d/{{item.value.slug}}.conf
+  with_dict: sites
+  notify: restart php5-fpm
+
+- name: php5-fpm will start on vagrant-mounted event
+  lineinfile:
+    dest: /etc/init/php5-fpm.conf
+    line: "start on vagrant-mounted"
+    state: present
+  when: env == "development"

@@ -1,0 +1,18 @@
+#################################################
+# Download & Install WP-CLI (http://wp-cli.org/)
+#################################################
+
+- name: download wp-cli
+  get_url: url=https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar dest=/usr/local/bin/wp
+
+- name: update wp-cli perms to add executable bit
+  file: path=/usr/local/bin/wp mode="0755"
+
+###############################
+# Download & Install WordPress
+###############################
+
+- name: ensure site directories exist
+  file: path={{ item.value.public_path }} state=directory mode=0755
+  with_dict: sites
+

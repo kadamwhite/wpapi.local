@@ -6,5 +6,12 @@
       service: name=php5-fpm state=restarted
   sudo: true
   roles:
+      # Install dependencies and get box up to date.
     - base
+      # Configure server with users, long-running processes, etc.
     - configure
+    - nginx
+    - mysql
+    - php
+      # Set up WP-CLI and use it to install WordPress.
+    - wordpress
