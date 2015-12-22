@@ -1,0 +1,8 @@
+#############
+# WEB SERVER
+#############
+
+nginx_dir: /etc/nginx
+nginx_conf_dir: '{{nginx_dir}}/conf.d'
+nginx_sites_available: '{{nginx_dir}}/sites-available'
+nginx_sites_enabled: '{{nginx_dir}}/sites-enabled'
