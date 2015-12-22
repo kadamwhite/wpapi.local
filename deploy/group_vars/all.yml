@@ -11,7 +11,7 @@ hostname: ansible-vagrant
 base_path: /mnt
 
 # Where the production site symlink will exist.
-site_path: "{{base_path}}/site"
+site_path: '{{base_path}}/site'
 
 ########
 # SITES
