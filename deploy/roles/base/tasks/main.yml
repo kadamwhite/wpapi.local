@@ -4,16 +4,15 @@
 
 # NOTE: commented out because we do not currently need node on the vm
 # - name: add keys to apt
-#   apt_key: url={{item}} state=present
-#   with_items: apt_keys
+#   apt_key: url={{ item }} state=present
+#   with_items: apt.keys
 
-# NOTE: commented out because we do not currently need git or node on the vm
-# - name: add ppas to apt
-#   apt_repository: repo="{{item}}" state=present update_cache=yes
-#   with_items: apt_ppas
+- name: add ppas to apt
+  apt_repository: repo={{ item }} state=present update_cache=yes
+  with_items: apt.ppas
 
 - name: install apt packages
-  apt: name={{item}} state=latest update_cache=yes
+  apt: name={{ item }} state=latest update_cache=yes
   with_items: apt.packages
 
 - name: Check for auto-removable packages

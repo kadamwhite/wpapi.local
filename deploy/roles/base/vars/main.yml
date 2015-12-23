@@ -12,16 +12,16 @@ apt:
   # version codename, if necessary):
   # Git latest:  ppa:git-core/ppa
   # Node.js 5.x: deb https://deb.nodesource.com/setup_5.x trusty main
-  # NOTE: commented out because we do not currently need git or node on the vm
-  # ppas:
-  #   - "ppa:git-core/ppa"
-  #   - "deb https://deb.nodesource.com/setup_5.x trusty main"
+  ppas:
+    - 'ppa:git-core/ppa'
+    # NOTE: Node is commented out because we do not currently need node on the vm
+    # - "deb https://deb.nodesource.com/setup_5.x trusty main"
 
   # Any apt packages to install. Apt package versions may be specified like
   # - git=2.1.0
   packages:
-    # NOTE: commented out because we do not currently need git or node on the vm
-    # - git
+    - git
+    # NOTE: commented out because we do not currently need node on the vm
     # - nodejs
     - nginx
     - php5-cli
