@@ -6,3 +6,4 @@
     - include: handlers/handlers.yml
   roles:
     - wordpress
+    - wp-content

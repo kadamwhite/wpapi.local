@@ -1,0 +1,2 @@
+# Empty databases by default
+wp_empty_db: true

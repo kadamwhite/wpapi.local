@@ -1,0 +1,39 @@
+# Empty database and delete uploaded files
+
+- debug: msg="wp_empty_db flag is set -- deleting all content!"
+  when: wp_empty_db == true
+
+- name: empty the wp database to prepare for fresh content
+  command: wp site empty --yes --path={{ site.wp_path }}
+  sudo_user: www-data # wp-cli complains when run as root
+  when: wp_empty_db == true
+
+- name: remove all uploaded files to prepare for fresh content
+  command: rm -rf {{ site.wp_path }}/content/uploads/*
+  ignore_errors: true
+  when: wp_empty_db == true
+
+# Install sample content
+
+- name: check whether the wp importer plugin is installed
+  command: wp plugin is-installed wordpress-importer --path={{ site.wp_path }}
+  sudo_user: www-data # wp-cli complains when run as root
+  ignore_errors: true
+  register: wp_importer_installed
+
+- debug: msg="importer plugin not present, it will now be installed"
+  when: wp_importer_installed|failed
+
+- name: install wp importer plugin
+  command: wp plugin install wordpress-importer --path={{ site.wp_path }} --activate
+  sudo_user: www-data # wp-cli complains when run as root
+  when: wp_importer_installed|failed
+
+# Download and install theme unit test data
+
+- name: retrieve the wp.com "theme unit test" sample data
+  get_url: url=https://wpcom-themes.svn.automattic.com/demo/theme-unit-test-data.xml dest=/tmp/theme-unit-test-data.xml
+
+- name: install "theme unit test" data into wp site
+  command: wp import /tmp/theme-unit-test-data.xml --path={{ site.wp_path }} --authors=create
+  sudo_user: www-data # wp-cli complains when run as root

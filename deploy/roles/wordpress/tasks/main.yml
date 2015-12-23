@@ -41,17 +41,18 @@
   stat: path={{ site.public_path }}/wp-config.php
   register: wp_config
 
+# Note: get_url cannot be used here because its registered output does not include
+# the retrieved file's contents. Using curl/stdout feels sub-optimal, but I know
+# no other way to read the contents of a remote get into a variable that can then
+# be used within a template.
+- name: generate the salts to be injected into the generated wp-config.php file
+  command: curl https://api.wordpress.org/secret-key/1.1/salt/
+  when: wp_config.stat.exists == false
+  register: wp_salts
+
 - name: generate wp-config.php file from template
   template: src=wp-config.php dest={{ site.public_path }}/wp-config.php
   when: wp_config.stat.exists == false
-
-- name: check to see if the salts file already exists
-  stat: path={{ site.public_path }}/salts.php
-  register: wp_salts
-
-- name: get salts that will be required from the generated wp-config.php
-  get_url: url=https://api.wordpress.org/secret-key/1.1/salt/ dest={{ site.public_path }}/salts.php
-  when: wp_salts.stat.exists == false
 
 # Create the web root-level index.php file
 

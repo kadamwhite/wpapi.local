@@ -47,13 +47,15 @@ define( 'WP_CONTENT_URL', 'http://{{ site.fqdn }}/content' );
 /**
  * Authentication Unique Keys and Salts.
  *
- * The file that this links to should be the generated output of the
- * {@link https://api.wordpress.org/secret-key/1.1/salt/ WordPress.org secret-key service}
+ * Regenerate these using the {@link https://api.wordpress.org/secret-key/1.1/salt/ WordPress.org secret-key service}
  * You can change these at any point in time to invalidate all existing cookies. This will force all users to have to log in again.
  *
  * @since 2.6.0
  */
-//require_once( dirname( __FILE__ ) . '/salts.php' );
+{# salts are retrieved via curl: iterate over the lines of curl's stdout to render them here #}
+{% for line in wp_salts.stdout_lines %}
+{{ line }}
+{% endfor %}
 
 /**
  * WordPress Database Table prefix.
