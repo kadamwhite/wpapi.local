@@ -9,8 +9,7 @@
   notify: restart php5-fpm
 
 - name: php5-fpm pool is configured for wordpress
-  template: src=wordpress.conf dest=/etc/php5/fpm/pool.d/{{item.value.slug}}.conf
-  with_dict: sites
+  template: src=wordpress.conf dest=/etc/php5/fpm/pool.d/{{ site.slug }}.conf
   notify: restart php5-fpm
 
 - name: php5-fpm will start on vagrant-mounted event

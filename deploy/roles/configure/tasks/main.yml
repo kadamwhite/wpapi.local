@@ -2,16 +2,15 @@
 # the project is cloned or built.
 
 - name: set hostname
-  hostname: name={{hostname}}
+  hostname: name={{ hostname }}
 
 - name: add loopback references to our domains in /etc/hosts
   lineinfile:
     dest: /etc/hosts
     state: present
-    line: 127.0.0.1 {{hostname}} {{item}}
+    line: 127.0.0.1 {{ hostname }} {{ item }}
   with_items:
-    - '{{sites.trunk.fqdn}}'
-    - '{{sites.stable.fqdn}}'
+    - '{{ site.fqdn }}'
 
 - name: allow passwordless sudo - development only!
   lineinfile:

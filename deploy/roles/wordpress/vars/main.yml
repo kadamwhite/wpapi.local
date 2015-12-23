@@ -3,3 +3,4 @@ wp:
     # Initial admin account username & password for new installs
     user: apiuser
     pass: password
+    email: apiuser@apiuser.email

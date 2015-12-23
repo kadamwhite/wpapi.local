@@ -11,31 +11,28 @@ hostname: ansible-vagrant
 base_path: /mnt
 
 # Where the production site symlink will exist.
-site_path: '{{base_path}}/site'
+site_path: '{{base_path}}/www'
 
 ########
 # SITES
 ########
 
-sites:
+site:
   # public_path: The web root of the site in the VM.
-  # wp_path:     The path to the wordpress core files in the VM.
-  # fqdn:        A fully-qualified domain name. The fqdn settings should match
-  #              the vagrant config.hostsupdater.aliases settings: because
-  #              nginx checks this value against the URL being requested, it
-  #              must be the same as the server's DNS name.
-  # slug:        The string used for the database name for each WP installation
-  #              in the VM, as well as the name of the site's nginx .conf file.
+  public_path: '{{site_path}}'
+
+  # wp_path: The path to the wordpress core files in the VM.
+  wp_path: '{{site_path}}/wp'
+
+  # fqdn: A fully-qualified domain name. The fqdn settings should match
+  # the vagrant config.hostsupdater.aliases settings: because nginx
+  # checks this value against the URL being requested, it must be the
+  # same as the server's DNS name.
+  fqdn: 'wpapi.loc'
+
+  # slug:  The string used for the database name for each WP installation
+  # in the VM, as well as the name of the site's nginx .conf file.
+  slug: 'wpstable'
+
   # title:       The human-facing title of this WP site
-  stable:
-    public_path: '{{site_path}}/wpstable'
-    wp_path: '{{site_path}}/wpstable/wp'
-    fqdn: 'wpapi.loc'
-    slug: 'wpstable'
-    title: 'WP-API on Latest Stable Release'
-  # trunk:
-  #   public_path: '{{site_path}}/wptrunk'
-  #   wp_path: '{{site_path}}/wptrunk/wp'
-  #   fqdn: 'wpapi-trunk.loc'
-  #   slug: 'wptrunk'
-  #   title: 'WP-API on Development Trunk'
+  title: 'WP-API Testbed'

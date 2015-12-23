@@ -31,14 +31,12 @@
 - name: remove the mysql test database
   mysql_db: db=test state=absent
 
-# Ensure databases and database users are available for each WP site.
+# Ensure the WP site's database and database user are available
 
 - name: ensure databases for each site are present and configured with the proper user
-  mysql_db: name={{ item.value.slug }} state=present
-  with_dict: sites
+  mysql_db: name={{ site.slug }} state=present
   register: db_state
 
 - name: ensure database users for each site are present and have all permissions on their corresponding DB
-  mysql_user: name={{ item.value.slug }} password={{ item.value.slug }} priv={{ item.value.slug }}.*:ALL,GRANT
-  with_dict: sites
+  mysql_user: name={{ site.slug }} password={{ site.slug }} priv={{ site.slug }}.*:ALL,GRANT
   register: db_users

@@ -2,8 +2,13 @@
 # Download & Install WP-CLI (http://wp-cli.org/)
 #################################################
 
+- name: check whether wp-cli is available
+  stat: path=/usr/local/bin/wp
+  register: wp_cli
+
 - name: download wp-cli
   get_url: url=https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar dest=/usr/local/bin/wp
+  when: wp_cli.stat.exists == false
 
 - name: update wp-cli perms to add executable bit
   file: path=/usr/local/bin/wp mode="0755"
@@ -17,36 +22,60 @@
 #   sudo_user: www-data
 
 - name: ensure site directory exists
-  file: path={{ item.value.public_path }} state=directory mode=0755 owner='www-data'
-  with_dict: sites
+  file: path={{ site.public_path }} state=directory mode=0755 owner='www-data' group='www-data'
 
 # Download WordPress core files
 
 - name: check whether wp is already downloaded
-  stat: path={{ item.value.wp_path }}/index.php
-  with_dict: sites
+  stat: path={{ site.wp_path }}/index.php
   register: wp_downloaded
 
 - name: download wp core if not previously downloaded
-  command: wp core download --path={{ item.item.value.wp_path }}
+  command: wp core download --path={{ site.wp_path }}
   sudo_user: www-data # wp-cli complains when run as root
-  with_items: wp_downloaded.results
-  when: ( item.stat.exists == false )
+  when: wp_downloaded.stat.exists == false
 
 # Create the wp-config.php file
 
 - name: check whether wp-config.php file already exists
-  stat: path={{ item.value.public_path }}/wp-config.php
-  with_dict: sites
+  stat: path={{ site.public_path }}/wp-config.php
   register: wp_config
 
-- name: generate wp-config.php file
-  command: wp core config --debug --path={{ item.item.value.wp_path }} --dbname={{ item.item.value.slug }} --dbuser={{ item.item.value.slug }} --dbpass={{ item.item.value.slug }}
-  sudo_user: www-data # wp-cli complains when run as root
-  with_items: wp_config.results
-  when: ( item.stat.exists == false )
+- name: generate wp-config.php file from template
+  template: src=wp-config.php dest={{ site.public_path }}/wp-config.php
+  when: wp_config.stat.exists == false
 
-- name: move wp-config.php up one level
-  command: mv {{ item.item.value.wp_path }}/wp-config.php {{ item.item.value.public_path }}/wp-config.php
-  with_items: wp_config.results
-  when: ( item.stat.exists == false )
+- name: check to see if the salts file already exists
+  stat: path={{ site.public_path }}/salts.php
+  register: wp_salts
+
+- name: get salts that will be required from the generated wp-config.php
+  get_url: url=https://api.wordpress.org/secret-key/1.1/salt/ dest={{ site.public_path }}/salts.php
+  when: wp_salts.stat.exists == false
+
+# Create the web root-level index.php file
+
+- name: check whether index.php file already exists
+  stat: path={{ site.public_path }}/index.php
+  register: wp_index_file
+
+- name: copy index.php file from wordpress core directory
+  command: cp {{ site.wp_path }}/index.php {{ site.public_path }}/index.php
+  when: wp_index_file.stat.exists == false
+
+- name: update require path in root index.php to point at wp core index.php
+  replace: dest={{ site.public_path }}/index.php regexp="'/wp-blog-header.php" replace="'/wp/wp-blog-header.php"
+  when: wp_index_file.stat.exists == false
+
+# Install WordPress
+
+- name: check whether wp is already installed
+  command: wp core is-installed --path={{ site.wp_path }}
+  sudo_user: www-data # wp-cli complains when run as root
+  ignore_errors: true
+  register: wp_installed
+
+- name: install wp
+  command: wp core install --path={{ site.wp_path }} --url=http://{{ site.fqdn }} --title='{{ site.title }}' --admin_user='{{ wp.admin.user }}' --admin_password='{{ wp.admin.pass }}' --admin_email='{{ wp.admin.email }}'
+  sudo_user: www-data # wp-cli complains when run as root
+  # when: wp_installed|failed

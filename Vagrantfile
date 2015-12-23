@@ -19,8 +19,7 @@ Vagrant.configure(2) do |config|
   # sudo). This should match the site.fqdn setting in the ansible config.
   # N.B. this requires the vagrant-hostsupdater plugin, see the README
   config.hostsupdater.aliases = [
-    'wpapi.loc',      # Latest stable WP release
-    'wpapi-trunk.loc' # WordPress development trunk
+    'wpapi.loc' # Latest stable WP release
   ]
 
   # Share an additional folder to the guest VM. The first argument is
@@ -28,6 +27,7 @@ Vagrant.configure(2) do |config|
   # the path on the guest to mount the folder. And the optional third
   # argument is a set of non-required options.
   # config.vm.synced_folder "../data", "/vagrant_data"
+  config.vm.synced_folder "content", "/mnt/www/content", owner: 'www-data', group: 'www-data'
 
   # A specific name looks much better than "default" in ansible output.
   config.vm.define 'vagrant'
@@ -47,5 +47,5 @@ Vagrant.configure(2) do |config|
   # the php5-fpm init script is triggered during startup before vagrant mounts
   # the shared folder. as a result, php5-fpm can't start. this ensures it will
   # always be started after that event.
-  # config.vm.provision :shell, :inline => "sudo service php5-fpm start || true", run: "always"
+  config.vm.provision :shell, :inline => "sudo service php5-fpm start || true", run: "always"
 end

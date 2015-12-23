@@ -2,24 +2,21 @@
 # config is invalid.
 
 - name: ensure default nginx server is not present
-  file: path={{nginx_sites_enabled}}/default state=absent
+  file: path={{ nginx_sites_enabled }}/default state=absent
 
 - name: ensure nginx config files exist
-  shell: touch {{nginx_sites_available}}/{{item.value.slug}}
+  shell: touch {{ nginx_sites_available }}/{{ site.slug }}
   args:
-    creates: '{{nginx_sites_available}}/{{item.value.slug}}'
-  with_dict: sites
+    creates: '{{ nginx_sites_available }}/{{ site.slug }}'
 
 - name: backup existing nginx config files
-  shell: cp {{item.value.slug}} {{item.value.slug}}.backup
+  shell: cp {{ site.slug }} {{ site.slug }}.backup
   args:
-    chdir: '{{nginx_sites_available}}'
-  with_dict: sites
+    chdir: '{{ nginx_sites_available }}'
 
 - name: generate nginx config files
-  template: src=nginx.conf dest={{nginx_sites_available}}/{{item.value.slug}}.conf
+  template: src=nginx.conf dest={{ nginx_sites_available }}/{{ site.slug }}.conf
   register: nginx_conf
-  with_dict: sites #'{{ sites | combine({ env: "{{env}}" }}'
   notify: restart nginx
 
 - name: ensure nginx config is valid
@@ -30,20 +27,17 @@
   when: nginx_conf | changed
 
 - name: remove temporary backups if new nginx config files are valid
-  file: path={{nginx_sites_available}}/{{item.value.slug}}.backup state=absent
-  with_dict: sites
+  file: path={{ nginx_sites_available }}/{{ site.slug }}.backup state=absent
   when: nginx_test_valid | success
 
 - name: restore temporary backups if new nginx config files are invalid
-  shell: mv {{item.value.slug}}.backup {{item.value.slug}}
+  shell: mv {{ site.slug }}.backup {{ site.slug }}
   args:
-    chdir: '{{nginx_sites_available}}'
-  with_dict: sites
+    chdir: '{{ nginx_sites_available }}'
   when: nginx_test_valid | failed
 
 - fail: msg='nginx config is invalid'
   when: nginx_test_valid | failed
 
-- name: ensure site vhosts files are symlinked into sites-enabled
-  file: src={{nginx_sites_available}}/{{item.value.slug}}.conf dest={{nginx_sites_enabled}}/{{item.value.slug}} state=link
-  with_dict: sites
+- name: ensure site vhosts file is symlinked into sites-enabled
+  file: src={{ nginx_sites_available }}/{{ site.slug }}.conf dest={{ nginx_sites_enabled }}/{{ site.slug }}.conf state=link
