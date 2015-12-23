@@ -1,0 +1,5 @@
+wp:
+  admin:
+    # Initial admin account username & password for new installs
+    user: apiuser
+    pass: password

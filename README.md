@@ -27,3 +27,11 @@ Run the following terminal command from within the repository folder:
 ```
 vagrant up
 ```
+
+## Running Specific Playbooks
+
+The provisioning of the machine is broken up into playbooks. To run a specific playbook, for example to execute the WordPress provisioning steps without re-running all of the server setup tasks as well, execute the following command directly from the root of the repository (using Vagrant's global private key, and the auto-generated inventory for this vagrant box):
+
+```sh
+ansible-playbook --private-key=~/.vagrant.d/insecure_private_key -u vagrant -i .vagrant/provisioners/ansible/inventory/vagrant_ansible_inventory deploy/wordpress.yml
+```

@@ -1,0 +1,33 @@
+- name: ensure site directory exists
+  file: path={{ item.value.public_path }} state=directory mode=0755
+  with_dict: sites
+
+- name: check whether wp is already downloaded
+  stat: path={{ item.value.public_path }}/wp/index.php
+  with_dict: sites
+  register: wp_downloaded
+
+- debug: var=wp_downloaded
+
+# - name: download wp core
+#   command: wp core download --path={{ item.value.public_path }}/wp
+#   when: wp_downloaded == False
+
+# - name: check whether wp is installed
+#   command: wp core is-installed
+#   args:
+#     chdir: '{{ item.value.public_path }}/'
+#   register: wp_installed
+#   ignore_errors: True
+
+# - name: install wp
+#   command: wp core install
+#             --url="{{ item.value.fqdn }}"
+#             --title="{{ wordpress_site_title }}"
+#             --admin_user="{{ wordpress_admin_user }}"
+#             --admin_password="{{ wordpress_admin_user_pass }}"
+#             --admin_email="{{ wordpress_admin_email }}"
+#   args:
+#       chdir: "{{ remote_wordpress_dir }}/"
+#   when: wordpress_is_installed|failed
+#   remote_user: "{{ remote_deploy_user }}"

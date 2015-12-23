@@ -1,0 +1,6 @@
+# Install dependencies and get box up to date.
+
+- hosts: all
+  sudo: true
+  roles:
+    - base

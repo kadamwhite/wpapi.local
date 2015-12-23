@@ -37,8 +37,8 @@ Vagrant.configure(2) do |config|
   # adding this code saves the trouble of having to run ansible-playbook
   # manually after "vagrant up".
   config.vm.provision 'ansible' do |ansible|
-    # Run init playbook
-    ansible.playbook = 'deploy/playbook.yml'
+    # Run initial provisioning playbook
+    ansible.playbook = 'deploy/provision.yml'
   end
 
   # ref https://github.com/mitchellh/vagrant/issues/1673

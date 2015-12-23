@@ -1,0 +1,11 @@
+# Configure server with users, long-running processes, etc.
+
+- hosts: all
+  sudo: true
+  handlers:
+    - include: handlers/handlers.yml
+  roles:
+    - configure
+    - nginx
+    - mysql
+    - php

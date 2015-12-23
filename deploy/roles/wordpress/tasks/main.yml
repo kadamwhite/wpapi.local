@@ -12,7 +12,41 @@
 # Download & Install WordPress
 ###############################
 
-- name: ensure site directories exist
-  file: path={{ item.value.public_path }} state=directory mode=0755
+# - name: create wp directories and download wp into them
+#   include: download-wp.yml
+#   sudo_user: www-data
+
+- name: ensure site directory exists
+  file: path={{ item.value.public_path }} state=directory mode=0755 owner='www-data'
   with_dict: sites
 
+# Download WordPress core files
+
+- name: check whether wp is already downloaded
+  stat: path={{ item.value.wp_path }}/index.php
+  with_dict: sites
+  register: wp_downloaded
+
+- name: download wp core if not previously downloaded
+  command: wp core download --path={{ item.item.value.wp_path }}
+  sudo_user: www-data # wp-cli complains when run as root
+  with_items: wp_downloaded.results
+  when: ( item.stat.exists == false )
+
+# Create the wp-config.php file
+
+- name: check whether wp-config.php file already exists
+  stat: path={{ item.value.public_path }}/wp-config.php
+  with_dict: sites
+  register: wp_config
+
+- name: generate wp-config.php file
+  command: wp core config --debug --path={{ item.item.value.wp_path }} --dbname={{ item.item.value.slug }} --dbuser={{ item.item.value.slug }} --dbpass={{ item.item.value.slug }}
+  sudo_user: www-data # wp-cli complains when run as root
+  with_items: wp_config.results
+  when: ( item.stat.exists == false )
+
+- name: move wp-config.php up one level
+  command: mv {{ item.item.value.wp_path }}/wp-config.php {{ item.item.value.public_path }}/wp-config.php
+  with_items: wp_config.results
+  when: ( item.stat.exists == false )

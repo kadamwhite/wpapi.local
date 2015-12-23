@@ -1,0 +1,5 @@
+# This is the top-most playbook, which runs automatically after `vagrant up`
+
+- include: install.yml
+- include: configure.yml
+- include: wordpress.yml
