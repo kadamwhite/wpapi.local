@@ -78,4 +78,21 @@
 - name: install wp
   command: wp core install --path={{ site.wp_path }} --url=http://{{ site.fqdn }} --title='{{ site.title }}' --admin_user='{{ wp.admin.user }}' --admin_password='{{ wp.admin.pass }}' --admin_email='{{ wp.admin.email }}'
   sudo_user: www-data # wp-cli complains when run as root
-  # when: wp_installed|failed
+  when: wp_installed|failed
+
+# Install WP-API plugin
+
+- name: check whether rest-api plugin is already installed
+  command: wp plugin is-installed rest-api --path={{ site.wp_path }}
+  sudo_user: www-data # wp-cli complains when run as root
+  ignore_errors: true
+  register: wp_rest_api
+
+- name: install rest-api plugin
+  command: wp plugin install rest-api --path={{ site.wp_path }} --activate
+  sudo_user: www-data # wp-cli complains when run as root
+  when: wp_rest_api|failed
+
+- name: configure permalinks to enable rest-api plugin to work
+  command: wp rewrite structure '/%year%/%monthnum%/%postname%' --path={{ site.wp_path }}
+  sudo_user: www-data # wp-cli complains when run as root
