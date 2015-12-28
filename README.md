@@ -32,8 +32,8 @@ This will create, provision and configure the server, then install a basic set o
 
 ## Running Specific Playbooks
 
-The provisioning of the machine is broken up into playbooks. To run a specific playbook, for example to execute the WordPress provisioning steps without re-running all of the server setup tasks as well, execute the following command directly from the root of the repository (using Vagrant's global private key, and the auto-generated inventory for this vagrant box):
+The provisioning of the machine is broken up into playbooks. The initial provisioning process will execute all playbooks necessary to set up the environment. To run a specific playbook at a later time, for example to execute the WordPress provisioning steps without re-running all of the server setup tasks as well, execute the following command directly from the root of the repository:
 
 ```sh
-ansible-playbook --private-key=~/.vagrant.d/insecure_private_key -u vagrant -i .vagrant/provisioners/ansible/inventory/vagrant_ansible_inventory deploy/wordpress.yml
+ansible-playbook -i deploy/vagrant deploy/wordpress.yml
 ```

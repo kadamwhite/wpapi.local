@@ -1,0 +1,15 @@
+# Configure vagrant for running locally.
+
+- hosts: vagrant
+  sudo: yes
+  gather_facts: no
+  vars:
+    user: "{{ lookup('env', 'USER') }}"
+    public_key_path: ~/.ssh/id_rsa.pub
+  handlers:
+    - include: handlers/handlers.yml
+  tasks:
+    - name: add the current user
+      user: name={{user}} group=sudo shell=/bin/bash
+    - name: add the current user's public key
+      authorized_key: user={{user}} key="{{ lookup('file', public_key_path) }}"
