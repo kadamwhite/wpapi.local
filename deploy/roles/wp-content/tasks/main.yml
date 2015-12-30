@@ -13,7 +13,7 @@
   ignore_errors: true
   when: wp_empty_db == true
 
-# Install sample content
+# Install WP importer plugin
 
 - name: check whether the wp importer plugin is installed
   command: wp plugin is-installed wordpress-importer --path={{ site.wp_path }}
@@ -40,9 +40,19 @@
 
 # Download and install theme unit test data
 
+- name: check whether theme unit test data is already present
+  # Antidisestablishmentarianism is a string used in the sample content: its
+  # presence is a reasonable indication that we're using the theme test data
+  shell: wp post list --path={{ site.wp_path }} | grep Antidisestablishmentarianism
+  sudo_user: www-data # wp-cli complains when run as root
+  ignore_errors: true
+  register: wp_theme_test_data_installed
+
 - name: retrieve the wp.com "theme unit test" sample data
   get_url: url=https://wpcom-themes.svn.automattic.com/demo/theme-unit-test-data.xml dest=/tmp/theme-unit-test-data.xml
+  when: wp_theme_test_data_installed|failed
 
 - name: install "theme unit test" data into wp site
   command: wp import /tmp/theme-unit-test-data.xml --path={{ site.wp_path }} --authors=create
   sudo_user: www-data # wp-cli complains when run as root
+  when: wp_theme_test_data_installed|failed

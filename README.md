@@ -37,3 +37,7 @@ The provisioning of the machine is broken up into playbooks. The initial provisi
 ```sh
 ansible-playbook -i deploy/vagrant deploy/wordpress.yml
 ```
+Or, to run the WordPress provisioner _without_ executing the default DB/content reset:
+```sh
+ansible-playbook -i deploy/vagrant deploy/wordpress.yml --extra-vars "wp_empty_db=false"
+```
