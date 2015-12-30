@@ -94,6 +94,24 @@
   sudo_user: www-data # wp-cli complains when run as root
   when: wp_rest_api|failed
 
+- name: ensure rest-api plugin is up to date
+  command: wp plugin update rest-api --path={{ site.wp_path }}
+  sudo_user: www-data # wp-cli complains when run as root
+  when: wp_rest_api|success
+
+- name: ensure rest-api plugin is active
+  command: wp plugin activate rest-api --path={{ site.wp_path }}
+  sudo_user: www-data # wp-cli complains when run as root
+
 - name: configure permalinks to enable rest-api plugin to work
   command: wp rewrite structure '/%year%/%monthnum%/%postname%' --path={{ site.wp_path }}
+  sudo_user: www-data # wp-cli complains when run as root
+
+# Install WP-API OAuth 1.0a plugin
+
+- name: clone and/or update oauth client plugin into plugins directory
+  git: repo=https://github.com/WP-API/OAuth1.git dest={{ site.public_path }}/content/plugins/api-oauth
+
+- name: ensure oauth plugin is activated
+  command: wp plugin activate api-oauth --path={{ site.wp_path }}
   sudo_user: www-data # wp-cli complains when run as root
