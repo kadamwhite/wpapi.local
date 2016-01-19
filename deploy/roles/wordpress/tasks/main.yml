@@ -115,3 +115,12 @@
 - name: ensure oauth plugin is activated
   command: wp plugin activate api-oauth --path={{ site.wp_path }}
   sudo_user: www-data # wp-cli complains when run as root
+
+# Install WP-API Basic Auth plugin
+
+- name: clone and/or update basic auth plugin into plugins directory
+  git: repo=https://github.com/WP-API/Basic-Auth.git dest={{ site.public_path }}/content/plugins/api-basic-auth
+
+- name: ensure basic auth plugin is activated
+  command: wp plugin activate api-basic-auth --path={{ site.wp_path }}
+  sudo_user: www-data # wp-cli complains when run as root
