@@ -4,3 +4,4 @@
 - include: configure.yml
 - include: wordpress.yml
 - include: vagrant.yml
+- include: restart-services.yml

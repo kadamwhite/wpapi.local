@@ -43,9 +43,4 @@ Vagrant.configure(2) do |config|
 
   # ref https://github.com/mitchellh/vagrant/issues/1673
   config.ssh.shell = "bash -c 'BASH_ENV=/etc/profile exec bash'"
-
-  # the php5-fpm init script is triggered during startup before vagrant mounts
-  # the shared folder. as a result, php5-fpm can't start. this ensures it will
-  # always be started after that event.
-  config.vm.provision :shell, :inline => "sudo service php5-fpm start || true", run: "always"
 end

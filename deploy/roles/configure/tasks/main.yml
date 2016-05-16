@@ -17,6 +17,6 @@
     dest: /etc/sudoers
     state: present
     regexp: ^%sudo
-    line: '%sudo\tALL=(ALL:ALL) NOPASSWD:ALL'
+    line: "%sudo\tALL=(ALL:ALL) NOPASSWD:ALL" # Must be double-quotes for escaping
     validate: visudo -cf %s
   when: env == 'development'

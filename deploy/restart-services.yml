@@ -1,0 +1,12 @@
+# Restart services integral to site hosting
+
+- hosts: vagrant
+  become: true
+  gather_facts: no
+  tasks:
+    - name: restart nginx
+      become: true
+      service: name=nginx state=restarted
+    - name: restart php5-fpm
+      become: true
+      service: name=php5-fpm state=restarted
