@@ -1,7 +1,7 @@
 # Set up WP-CLI and use it to install WordPress.
 
 - hosts: all
-  sudo: true
+  become: true
   handlers:
     - include: handlers/handlers.yml
   roles:

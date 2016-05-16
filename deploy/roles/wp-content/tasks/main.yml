@@ -5,7 +5,8 @@
 
 - name: empty the wp database to prepare for fresh content
   command: wp site empty --yes --path={{ site.wp_path }}
-  sudo_user: www-data # wp-cli complains when run as root
+  become: true
+  become_user: www-data # wp-cli complains when run as root
   when: wp_empty_db == true
 
 - name: remove all uploaded files to prepare for fresh content
@@ -17,7 +18,8 @@
 
 - name: check whether the wp importer plugin is installed
   command: wp plugin is-installed wordpress-importer --path={{ site.wp_path }}
-  sudo_user: www-data # wp-cli complains when run as root
+  become: true
+  become_user: www-data # wp-cli complains when run as root
   ignore_errors: true
   register: wp_importer_installed
 
@@ -26,17 +28,20 @@
 
 - name: install wp importer plugin
   command: wp plugin install wordpress-importer --path={{ site.wp_path }} --activate
-  sudo_user: www-data # wp-cli complains when run as root
+  become: true
+  become_user: www-data # wp-cli complains when run as root
   when: wp_importer_installed|failed
 
 - name: ensure wp importer plugin is up to date
   command: wp plugin update wordpress-importer --path={{ site.wp_path }}
-  sudo_user: www-data # wp-cli complains when run as root
+  become: true
+  become_user: www-data # wp-cli complains when run as root
   when: wp_importer_installed|success
 
 - name: ensure wp importer plugin is active
   command: wp plugin activate wordpress-importer --path={{ site.wp_path }}
-  sudo_user: www-data # wp-cli complains when run as root
+  become: true
+  become_user: www-data # wp-cli complains when run as root
 
 # Download and install theme unit test data
 
@@ -44,7 +49,8 @@
   # Antidisestablishmentarianism is a string used in the sample content: its
   # presence is a reasonable indication that we're using the theme test data
   shell: wp post list --path={{ site.wp_path }} | grep Antidisestablishmentarianism
-  sudo_user: www-data # wp-cli complains when run as root
+  become: true
+  become_user: www-data # wp-cli complains when run as root
   ignore_errors: true
   register: wp_theme_test_data_installed
 
@@ -54,5 +60,6 @@
 
 - name: install "theme unit test" data into wp site
   command: wp import /tmp/theme-unit-test-data.xml --path={{ site.wp_path }} --authors=create
-  sudo_user: www-data # wp-cli complains when run as root
+  become: true
+  become_user: www-data # wp-cli complains when run as root
   when: wp_theme_test_data_installed|failed

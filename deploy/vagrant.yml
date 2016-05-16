@@ -1,7 +1,7 @@
 # Configure vagrant for running locally.
 
 - hosts: vagrant
-  sudo: yes
+  become: true
   gather_facts: no
   vars:
     user: "{{ lookup('env', 'USER') }}"

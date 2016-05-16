@@ -9,11 +9,11 @@
 
 - name: add ppas to apt
   apt_repository: repo={{ item }} state=present update_cache=yes
-  with_items: apt.ppas
+  with_items: '{{apt.ppas}}'
 
 - name: install apt packages
   apt: name={{ item }} state=latest update_cache=yes
-  with_items: apt.packages
+  with_items: '{{apt.packages}}'
 
 - name: Check for auto-removable packages
   command: apt-get --dry-run autoremove
