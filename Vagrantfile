@@ -43,4 +43,9 @@ Vagrant.configure(2) do |config|
 
   # ref https://github.com/mitchellh/vagrant/issues/1673
   config.ssh.shell = "bash -c 'BASH_ENV=/etc/profile exec bash'"
+
+  # Run the restart-services playbook on _every_ `vagrant up`
+  config.vm.provision 'ansible', run: 'always' do |ansible|
+    ansible.playbook = 'deploy/restart-services.yml'
+  end
 end
