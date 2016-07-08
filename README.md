@@ -41,3 +41,7 @@ Or, to run the WordPress provisioner _without_ executing the default DB/content 
 ```sh
 ansible-playbook -i deploy/vagrant deploy/wordpress.yml --extra-vars "wp_empty_db=false"
 ```
+
+## Administering the Site
+
+The local WordPress install can be administered by logging in to WP-Admin at the link [http://wpapi.loc/wp/wp-admin](http://wpapi.loc/wp/wp-admin) with the username "apiuser" and the password "password".
