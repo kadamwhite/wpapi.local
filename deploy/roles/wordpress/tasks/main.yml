@@ -53,7 +53,7 @@
   register: wp_salts
 
 - name: generate wp-config.php file from template
-  template: src=wp-config.php dest={{ site.public_path }}/wp-config.php
+  template: src=wp-config.php dest={{ site.public_path }}/wp-config.php owner='www-data' group='www-data' mode='0660'
   when: wp_config.stat.exists == false
 
 # Create the web root-level index.php file
@@ -64,6 +64,8 @@
 
 - name: copy index.php file from wordpress core directory
   command: cp {{ site.wp_path }}/index.php {{ site.public_path }}/index.php
+  become: true
+  become_user: www-data # www-data should own the index.php file
   when: wp_index_file.stat.exists == false
 
 - name: update require path in root index.php to point at wp core index.php
