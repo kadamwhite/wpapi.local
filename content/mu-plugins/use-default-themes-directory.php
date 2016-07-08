@@ -6,4 +6,4 @@ Version:     1.0
 Author:      K. Adam White
 Author URI:  https://wordpress.org/support/profile/kadamwhite
  */
-register_theme_directory( ABSPATH . '/wp-content/themes' );
+register_theme_directory( ABSPATH . 'wp-content/themes/' );
