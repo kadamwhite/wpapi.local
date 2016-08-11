@@ -5,8 +5,7 @@
 
 - name: empty the wp database to prepare for fresh content
   command: wp site empty --yes --path={{ site.wp_path }}
-  become: true
-  become_user: www-data # wp-cli complains when run as root
+    --allow-root # wp-cli complains when run as root
   when: wp_empty_db == true
 
 - name: remove all uploaded files to prepare for fresh content
@@ -18,8 +17,7 @@
 
 - name: check whether the wp importer plugin is installed
   command: wp plugin is-installed wordpress-importer --path={{ site.wp_path }}
-  become: true
-  become_user: www-data # wp-cli complains when run as root
+    --allow-root # wp-cli complains when run as root
   ignore_errors: true
   register: wp_importer_installed
 
@@ -28,38 +26,33 @@
 
 - name: install wp importer plugin
   command: wp plugin install wordpress-importer --path={{ site.wp_path }} --activate
-  become: true
-  become_user: www-data # wp-cli complains when run as root
+    --allow-root # wp-cli complains when run as root
   when: wp_importer_installed|failed
 
 - name: ensure wp importer plugin is up to date
   command: wp plugin update wordpress-importer --path={{ site.wp_path }}
-  become: true
-  become_user: www-data # wp-cli complains when run as root
+    --allow-root # wp-cli complains when run as root
   when: wp_importer_installed|success
 
 - name: ensure wp importer plugin is active
   command: wp plugin activate wordpress-importer --path={{ site.wp_path }}
-  become: true
-  become_user: www-data # wp-cli complains when run as root
+    --allow-root # wp-cli complains when run as root
 
 # Download and install theme unit test data
 
 - name: check whether theme unit test data is already present
   # Antidisestablishmentarianism is a string used in the sample content: its
   # presence is a reasonable indication that we're using the theme test data
-  shell: wp post list --path={{ site.wp_path }} | grep Antidisestablishmentarianism
-  become: true
-  become_user: www-data # wp-cli complains when run as root
+  shell: wp post list --path={{ site.wp_path }} --allow-root | grep Antidisestablishmentarianism
   ignore_errors: true
   register: wp_theme_test_data_installed
 
 - name: retrieve the wp.com "theme unit test" sample data
   get_url: url=https://wpcom-themes.svn.automattic.com/demo/theme-unit-test-data.xml dest=/tmp/theme-unit-test-data.xml
   when: wp_theme_test_data_installed|failed
+  register: wp_theme_test_data_retrieved
 
 - name: install "theme unit test" data into wp site
   command: wp import /tmp/theme-unit-test-data.xml --path={{ site.wp_path }} --authors=create
-  become: true
-  become_user: www-data # wp-cli complains when run as root
-  when: wp_theme_test_data_installed|failed
+    --allow-root # wp-cli complains when run as root
+  when: wp_theme_test_data_retrieved
