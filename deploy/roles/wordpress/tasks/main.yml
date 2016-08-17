@@ -122,3 +122,13 @@
 - name: ensure basic auth plugin is activated
   command: wp plugin activate api-basic-auth --path={{ site.wp_path }}
     --allow-root # wp-cli complains when run as root
+
+# Environment cleanup & normalization
+
+- name: Ensure proper WordPress file ownership & permissions (755/644)
+  file:
+    path: "{{ site.wp_path }}"
+    mode: u=rwX,g=rX,o=rX
+    owner: www-data
+    group: www-data
+    recurse: yes
