@@ -48,4 +48,9 @@ Vagrant.configure(2) do |config|
   config.vm.provision 'ansible', run: 'always' do |ansible|
     ansible.playbook = 'deploy/restart-services.yml'
   end
+
+  # Keep Vagrant time synchronized with host system to avoid OAuth timestamp errors
+  config.vm.provider 'virtualbox' do |vb|
+    vb.customize [ 'guestproperty', 'set', :id, '/VirtualBox/GuestAdd/VBoxService/--timesync-set-threshold', 1000 ]
+  end
 end
