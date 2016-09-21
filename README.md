@@ -42,6 +42,34 @@ Or, to run the WordPress provisioner _without_ executing the default DB/content 
 ansible-playbook -i deploy/vagrant deploy/wordpress.yml --extra-vars "wp_empty_db=false"
 ```
 
+## Using Development Builds
+
+### WP Nightlies
+
+To run the nightly WP build instead of the latest stable release, run
+
+```sh
+ansible-playbook -i deploy/vagrant deploy/wordpress.yml --extra-vars "wp_nightly=true"
+```
+
+### REST API Development Branch
+
+To run the latest development branch of the REST API plugin instead of the released version, run
+
+```sh
+ansible-playbook -i deploy/vagrant deploy/wordpress.yml --extra-vars "wpapi_develop=true"
+```
+
+### All Development Everything
+
+Run the WordPress playbook with multiple extra variables like so:
+
+```sh
+--extra-vars "wp_nightly=true wpapi_develop=true"
+```
+
+It is advisable to reprovision the DB when switching WP versions to avoid migration issues.
+
 ## Administering the Site
 
 The local WordPress install can be administered by logging in to WP-Admin at the link [http://wpapi.loc/wp/wp-admin](http://wpapi.loc/wp/wp-admin) with the username "apiuser" and the password "password".

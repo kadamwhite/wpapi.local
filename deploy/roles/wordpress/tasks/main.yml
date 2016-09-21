@@ -20,16 +20,25 @@
 - name: ensure site directory exists
   file: path={{ site.public_path }} state=directory mode=0755 owner='www-data' group='www-data'
 
-# Download WordPress core files
+# To support switching between nightly builds & stable, always remove & recreate WP core files
+#
+- name: remove site directory if already present
+  file: path={{ site.wp_path }} state=absent
 
-- name: check whether wp is already downloaded
-  stat: path={{ site.wp_path }}/index.php
-  register: wp_downloaded
+# Download WordPress (Nightly Build) core files
 
-- name: download wp core if not previously downloaded
+- name: download latest nightly build of wp core
+  command: wp core download --path={{ site.wp_path }}
+    --version=nightly
+    --allow-root
+  when: wp_nightly
+
+# Download WordPress (Stable) core files
+
+- name: download latest stable build of wp core
   command: wp core download --path={{ site.wp_path }}
     --allow-root
-  when: wp_downloaded.stat.exists == false
+  when: not wp_nightly
 
 # Create the wp-config.php file
 
@@ -81,21 +90,43 @@
 
 # Install WP-API plugin
 
+- name: check whether the REST API plugin is currently using git
+  stat: path={{ site.public_path }}/content/plugins/rest-api/.git
+  register: wp_rest_git_dir
+
+- name: remove plugin directory entirely if switching from develop to stable or vice-versa
+  file: path={{ site.public_path }}/content/plugins/rest-api state=absent
+  when: ((wp_rest_git_dir.stat.exists == true and not wpapi_develop) or (wp_rest_git_dir.stat.exists == false and wpapi_develop))
+
+# DEVELOP: use latest code from git repository
+
+- name: clone and/or update WP REST API plugin into plugins directory
+  git: repo=https://github.com/WP-API/WP-API.git dest={{ site.public_path }}/content/plugins/rest-api
+  when: wpapi_develop
+
+- name: activate rest-api plugin
+  command: wp plugin activate rest-api --path={{ site.wp_path }}
+    --allow-root
+  when: wpapi_develop
+
+# NON-DEVELOP: use latest stable release from repo
+
 - name: check whether rest-api plugin is already installed
   command: wp plugin is-installed rest-api --path={{ site.wp_path }}
     --allow-root # wp-cli complains when run as root
   ignore_errors: true
   register: wp_rest_api
+  when: not wpapi_develop
 
 - name: install rest-api plugin
   command: wp plugin install rest-api --path={{ site.wp_path }} --activate
     --allow-root # wp-cli complains when run as root
-  when: wp_rest_api|failed
+  when: (not wpapi_develop and wp_rest_api|failed)
 
 - name: ensure rest-api plugin is up to date
   command: wp plugin update rest-api --path={{ site.wp_path }}
     --allow-root # wp-cli complains when run as root
-  when: wp_rest_api|success
+  when: (not wpapi_develop and wp_rest_api|success)
 
 - name: ensure rest-api plugin is active
   command: wp plugin activate rest-api --path={{ site.wp_path }}
