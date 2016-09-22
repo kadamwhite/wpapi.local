@@ -32,7 +32,6 @@
 - name: ensure wp importer plugin is up to date
   command: wp plugin update wordpress-importer --path={{ site.wp_path }}
     --allow-root # wp-cli complains when run as root
-  when: wp_importer_installed|success
 
 - name: ensure wp importer plugin is active
   command: wp plugin activate wordpress-importer --path={{ site.wp_path }}
