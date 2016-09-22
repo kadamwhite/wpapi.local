@@ -21,7 +21,7 @@
   file: path={{ site.public_path }} state=directory mode=0755 owner='www-data' group='www-data'
 
 # To support switching between nightly builds & stable, always remove & recreate WP core files
-#
+
 - name: remove site directory if already present
   file: path={{ site.wp_path }} state=absent
 

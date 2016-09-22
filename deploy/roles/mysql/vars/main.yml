@@ -1,2 +1,5 @@
 # Password for the VM's mysql root user
 mysql_root_password: wpapidbroot
+
+# Recreate database each provision by default
+wp_empty_db: true

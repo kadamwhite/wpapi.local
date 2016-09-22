@@ -48,7 +48,7 @@
   register: wp_theme_test_data_installed
 
 - name: retrieve the wp.com "theme unit test" sample data
-  get_url: url=https://wpcom-themes.svn.automattic.com/demo/theme-unit-test-data.xml dest=/tmp/theme-unit-test-data.xml
+  copy: src=theme-unit-test-data.xml dest=/tmp/theme-unit-test-data.xml
   when: wp_theme_test_data_installed|failed
   register: wp_theme_test_data_retrieved
 

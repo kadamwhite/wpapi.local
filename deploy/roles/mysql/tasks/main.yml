@@ -33,10 +33,14 @@
 
 # Ensure the WP site's database and database user are available
 
-- name: ensure databases for each site are present and configured with the proper user
+- name: remove the WP database unless explicitly preserving data
+  mysql_db: name={{ site.slug }} state=absent
+  when: wp_empty_db
+
+- name: ensure database for WP site is present and configured with the proper user
   mysql_db: name={{ site.slug }} state=present
   register: db_state
 
-- name: ensure database users for each site are present and have all permissions on their corresponding DB
+- name: ensure database users for WP site are present and have all permissions on their corresponding DB
   mysql_user: name={{ site.slug }} password={{ site.slug }} priv={{ site.slug }}.*:ALL,GRANT
   register: db_users
