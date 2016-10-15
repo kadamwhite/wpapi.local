@@ -44,20 +44,34 @@ ansible-playbook -i deploy/vagrant deploy/wordpress.yml --extra-vars "wp_empty_d
 
 ## Using Development Builds
 
-### WP Nightlies
+**NOTE:** By default wpapi-vagrant-varietal currently uses WP nightly builds, and the development branch of the API plugin. The VM can also be configured to use the latest stable release of both WordPress and the REST API. This allows client development to track against the latest & greatest, and also be tested against the stable releases.
 
-To run the nightly WP build instead of the latest stable release, run
+### WP Stable vs Nightlies
+
+To run the nightly WP build instead of the latest stable release, run the playbook without any extra variables or specify explicitly
 
 ```sh
 ansible-playbook -i deploy/vagrant deploy/wordpress.yml --extra-vars "wp_nightly=true"
 ```
 
+Conversely, to use WP Stable, run
+
+```sh
+ansible-playbook -i deploy/vagrant deploy/wordpress.yml --extra-vars "wp_nightly=false"
+```
+
 ### REST API Development Branch
 
-To run the latest development branch of the REST API plugin instead of the released version, run
+To run the latest development branch of the REST API plugin instead of the released version, run the playbook without any extra variables or specify explicitly
 
 ```sh
 ansible-playbook -i deploy/vagrant deploy/wordpress.yml --extra-vars "wpapi_develop=true"
+```
+
+To use the stable release, run
+
+```sh
+ansible-playbook -i deploy/vagrant deploy/wordpress.yml --extra-vars "wpapi_develop=false"
 ```
 
 ### All Development Everything
@@ -68,7 +82,13 @@ Run the WordPress playbook with multiple extra variables like so:
 --extra-vars "wp_nightly=true wpapi_develop=true"
 ```
 
-It is advisable to reprovision the DB when switching WP versions to avoid migration issues.
+### Stable Everything
+
+```sh
+--extra-vars "wp_nightly=false wpapi_develop=false"
+```
+
+It is advisable to empty & re-provision the DB when switching WP versions to avoid migration issues.
 
 ## Administering the Site
 
