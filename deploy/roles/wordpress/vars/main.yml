@@ -5,5 +5,4 @@ wp:
     pass: password
     email: apiuser@apiuser.email
 # Use latest stable WP & WP-API version by default
-wp_nightly: true
-wpapi_develop: true
+wp_nightly: false
