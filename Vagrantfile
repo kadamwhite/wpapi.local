@@ -19,7 +19,7 @@ Vagrant.configure(2) do |config|
   # sudo). This should match the site.fqdn setting in the ansible config.
   # N.B. this requires the vagrant-hostsupdater plugin, see the README
   config.hostsupdater.aliases = [
-    'wpapi.loc' # Latest stable WP release
+    'wpapi.test' # Latest stable WP release
   ]
 
   # Share an additional folder to the guest VM. The first argument is

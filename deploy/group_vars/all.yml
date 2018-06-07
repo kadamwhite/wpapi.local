@@ -28,7 +28,7 @@ site:
   # the vagrant config.hostsupdater.aliases settings: because nginx
   # checks this value against the URL being requested, it must be the
   # same as the server's DNS name.
-  fqdn: 'wpapi.loc'
+  fqdn: 'wpapi.test'
 
   # slug:  The string used for the database name for each WP installation
   # in the VM, as well as the name of the site's nginx .conf file.

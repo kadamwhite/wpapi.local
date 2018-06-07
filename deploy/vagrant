@@ -3,4 +3,4 @@
 # The ansible_ssh_host value should match the vagrant site.fqdn and Vagrantfile
 # config.hostsupdater.aliases settings.
 
-vagrant ansible_ssh_host=wpapi.loc
+vagrant ansible_ssh_host=wpapi.test

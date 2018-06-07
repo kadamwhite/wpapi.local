@@ -79,4 +79,4 @@ It is advisable to empty & re-provision the DB when switching WP versions to avo
 
 ## Administering the Site
 
-The local WordPress install can be administered by logging in to WP-Admin at the link [http://wpapi.loc/wp/wp-admin](http://wpapi.loc/wp/wp-admin) with the username "apiuser" and the password "password".
+The local WordPress install can be administered by logging in to WP-Admin at the link [http://wpapi.test/wp/wp-admin](http://wpapi.test/wp/wp-admin) with the username "apiuser" and the password "password".
