@@ -1,0 +1,8 @@
+hosts:
+  - wpapi.local
+
+extensions:
+    - kadamwhite/chassis-wxr
+
+wxr:
+  path: theme-unit-test-data.xml
