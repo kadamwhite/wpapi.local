@@ -22,6 +22,11 @@ Then, start the VM:
 vagrant up
 ```
 
+Install the unit testing data:
+```bash
+vagrant provision
+```
+
 Finally, run this command to set "pretty permalinks" to enable the `wp-json/` route:
 
 ```bash
