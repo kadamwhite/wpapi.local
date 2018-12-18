@@ -1,3 +1,0 @@
-[submodule "mu-plugins/basic-auth"]
-	path = mu-plugins/basic-auth
-	url = git@github.com:WP-API/Basic-Auth.git
