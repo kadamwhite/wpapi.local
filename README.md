@@ -13,7 +13,7 @@ Pull down Chassis, then clone this repository as the `content` folder within you
 git clone --recursive https://github.com/Chassis/Chassis wpapi.local
 
 cd wpapi.local
-git clone --recursive git@github.com:kadamwhite/wpapi.local.git content
+git clone --recursive https://github.com/kadamwhite/wpapi.local content
 ```
 
 Then, start the VM:
