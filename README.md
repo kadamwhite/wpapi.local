@@ -22,10 +22,10 @@ Then, start the VM:
 vagrant up
 ```
 
-Finally, run this command to set "pretty permalinks" to enable the `wp-json/` route:
+Finally, run the `setup.sh` bash script to finish VM configuration. This will set "pretty permalinks" to enable the `wp-json/` route, delete the default sample post and page, and create some auxiliary testing users.
 
 ```bash
-vagrant ssh -c "wp rewrite structure '/%year%/%monthnum%/%postname%'"
+bash content/setup.sh
 ```
 
 You should now be able to visit the WordPress site at [wpapi.local](http://wpapi.local), and the integration tests on the `node-wpapi` repo should now pass when run.
