@@ -23,10 +23,10 @@ vagrant up
 vagrant provision
 ```
 
-Finally, run the `setup.sh` bash script to finish VM configuration. This will set "pretty permalinks" to enable the `wp-json/` route and ensure the basic authentication plugin is active.
+Finally, run this command to set "pretty permalinks" to enable the `wp-json/` route:
 
 ```bash
-bash content/setup.sh
+vagrant ssh -c "wp rewrite structure '/%year%/%monthnum%/%postname%'"
 ```
 
 You should now be able to visit the WordPress site at [wpapi.local](http://wpapi.local), and the integration tests on the `node-wpapi` repo should now pass when run.
