@@ -6,3 +6,4 @@ extensions:
 
 wxr:
   path: theme-unit-test-data.xml
+  clean: true

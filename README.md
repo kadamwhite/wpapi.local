@@ -16,13 +16,14 @@ cd wpapi.local
 git clone --recursive git@github.com:kadamwhite/wpapi.local.git content
 ```
 
-Then, start the VM:
+Then, start the VM. Note that you must run the provisioner twice, because the content import step will not execute until after the WordPress environment exists.
 
 ```bash
 vagrant up
+vagrant provision
 ```
 
-Finally, run the `setup.sh` bash script to finish VM configuration. This will set "pretty permalinks" to enable the `wp-json/` route, delete the default sample post and page, and create some auxiliary testing users.
+Finally, run the `setup.sh` bash script to finish VM configuration. This will set "pretty permalinks" to enable the `wp-json/` route and ensure the basic authentication plugin is active.
 
 ```bash
 bash content/setup.sh
