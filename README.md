@@ -16,11 +16,10 @@ cd wpapi.local
 git clone --recursive git@github.com:kadamwhite/wpapi.local.git content
 ```
 
-Then, start the VM. Note that you must run the provisioner twice, because the content import step will not execute until after the WordPress environment exists.
+Then, start the VM:
 
 ```bash
 vagrant up
-vagrant provision
 ```
 
 Finally, run this command to set "pretty permalinks" to enable the `wp-json/` route:
