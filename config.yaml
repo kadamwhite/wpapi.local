@@ -4,6 +4,9 @@ hosts:
 extensions:
   - kadamwhite/chassis-wxr
 
+plugins:
+  - https://github.com/WP-API/Basic-Auth/archive/master.zip
+
 wxr:
   path: theme-unit-test-data.xml
   clean: true
