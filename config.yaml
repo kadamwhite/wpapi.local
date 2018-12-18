@@ -1,6 +1,9 @@
 hosts:
   - wpapi.local
 
+site:
+  name: WP-API Testbed
+
 extensions:
   - kadamwhite/chassis-wxr
 
