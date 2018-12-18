@@ -3,10 +3,14 @@
 # Set permalinks
 vagrant ssh -c 'wp rewrite structure "/%year%/%monthnum%/%postname%"'
 
-# Clear out dummy content
+# Activate basic-auth plugin
+vagrant ssh -c 'wp plugin activate basic-auth'
+
+# Clear out dummy content ("hello world" post, "sample page", and "privacy policy")
 vagrant ssh -c '
-wp post delete $(wp post list --format=ids) --force
-wp post delete $(wp post list --format=ids --post_type=page) --force
+wp post delete 1 --force
+wp post delete 2 --force
+wp post delete 2 --force
 '
 
 # Create subscriber, author & editor users, for roles testing
