@@ -10,3 +10,5 @@ extensions:
 wxr:
   path: theme-unit-test-data.xml
   clean: true
+
+php: 7.2
