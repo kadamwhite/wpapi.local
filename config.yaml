@@ -6,9 +6,12 @@ site:
 
 extensions:
   - kadamwhite/chassis-wxr
+  - kadamwhite/chassis-permalink
 
 wxr:
   path: theme-unit-test-data.xml
   clean: true
+
+permalink: '/%year%/%monthnum%/%postname%/'
 
 php: 7.2
